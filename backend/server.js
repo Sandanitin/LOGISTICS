@@ -36,6 +36,7 @@ const connectDB = async () => {
 
 connectDB();
 
+
 // Email configuration
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE,
