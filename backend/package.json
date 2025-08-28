@@ -1,6 +1,7 @@
 {
   "name": "contact-form-backend",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Backend for contact form with Nodemailer",
   "main": "server.js",
   "scripts": {
