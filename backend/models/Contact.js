@@ -35,4 +35,6 @@ const contactSchema = new mongoose.Schema({
 // Index for better query performance
 contactSchema.index({ email: 1, createdAt: -1 });
 
+//add comment
+
 module.exports = mongoose.model('Contact', contactSchema);
