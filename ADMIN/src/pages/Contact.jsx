@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-const url= "https://logistics-ga33.onrender.com"
+const url= "https://logistics-zj1d.onrender.com"
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
