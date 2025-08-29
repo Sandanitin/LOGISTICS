@@ -20,8 +20,8 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
-    'https://logistics-1-pvw5.onrender.com', // Production frontend
-    'https://logistics-tkej.onrender.com',   // Production backend
+    // 'https://logistics-1-pvw5.onrender.com', // Production frontend
+    // 'https://logistics-tkej.onrender.com',   // Production backend
     'http://localhost:3000'                  // Local development
   ],
   credentials: true,
