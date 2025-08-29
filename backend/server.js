@@ -4,6 +4,7 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 const path = require('path');
+const jwt = require('jsonwebtoken'); // Add this line
 
 // Load environment variables
 if (!process.env.MONGODB_URI) {
@@ -12,6 +13,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 const Contact = require('./models/Contact');
+const User = require('./models/User'); // Add this line
 
 const app = express();
 
@@ -142,6 +144,34 @@ app.get('/api/contacts', async (req, res) => {
   } catch (error) {
     console.error('Error fetching contacts:', error);
     res.status(500).json({ error: 'Failed to fetch contacts' });
+  }
+});
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// API endpoint to get user profile
+app.get('/api/users/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
