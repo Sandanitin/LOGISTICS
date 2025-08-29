@@ -20,7 +20,8 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
-    'https://logistics-1-admin.onrender.com',
+    
+    'https://logistics-1-i2im.onrender.com',
     'http://localhost:3000'
   ],
   credentials: true,
