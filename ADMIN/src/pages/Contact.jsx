@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import axios from 'axios';
-const url= "https://logistics-ga33.onrender.com"
+
+// Use environment variable if available, otherwise default to local development
+const url = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+// For production deployment, set VITE_API_URL in your build environment to "https://logistics-tkej.onrender.com"
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
