@@ -18,7 +18,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://yourfrontenddomain.com' 
+    ? 'https://logistics-1-admin.onrender.com/' 
     : 'http://localhost:3000'
 }));
 app.use(express.json());
