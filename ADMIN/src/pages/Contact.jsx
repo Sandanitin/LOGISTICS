@@ -55,7 +55,7 @@ const Contact = () => {
     setSubmitStatus({ success: null, message: '' });
 
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', formData);
+      const response = await axios.post(`${url}/api/contact`, formData);
       
       setSubmitStatus({ 
         success: true, 
