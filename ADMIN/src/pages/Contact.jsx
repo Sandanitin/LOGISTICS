@@ -55,7 +55,12 @@ const Contact = () => {
     setSubmitStatus({ success: null, message: '' });
 
     try {
-      const response = await axios.post(`${url}/api/contact`, formData);
+      const response = await axios.post(`${url}/api/contact`, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      });
       
       setSubmitStatus({ 
         success: true, 
