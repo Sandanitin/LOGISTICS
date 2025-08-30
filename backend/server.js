@@ -4,7 +4,8 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 const path = require('path');
-const jwt = require('jsonwebtoken'); // Add this line
+const jwt = require('jsonwebtoken');
+const { getEmailTemplate } = require('./templates/emailTemplates'); // Add this line
 
 // Load environment variables
 if (!process.env.MONGODB_URI) {
@@ -91,28 +92,9 @@ app.post('/api/contact', async (req, res) => {
     // Send email
     const mailOptions = {
       from: process.env.EMAIL_FROM,
-      to: process.env.EMAIL_TO, // Make sure this is set in .env
+      to: process.env.EMAIL_TO,
       subject: `New Contact Form Submission: ${subject}`,
-      text: `
-        You have a new contact form submission:
-        
-        Name: ${name}
-        Email: ${email}
-        Subject: ${subject}
-        Message: ${message}
-        
-        This message was sent from your website's contact form.
-      `,
-      html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <hr>
-        <p>This message was sent from your website's contact form.</p>
-      `
+      ...getEmailTemplate(name, email, subject, message)
     };
 
     await transporter.sendMail(mailOptions);
