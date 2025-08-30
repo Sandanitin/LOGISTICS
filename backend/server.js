@@ -20,14 +20,15 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
-    // 'https://logistics-1-pvw5.onrender.com', // Production frontend
-    // 'https://logistics-tkej.onrender.com',   // Production backend
+    'https://logistics-1-pvw5.onrender.com', // Your Render frontend URL
     'http://localhost:3000'                  // Local development
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
 app.use(express.json());
 
 // Connect to MongoDB with better error handling
