@@ -1,36 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
-import adminApi from "../services/api";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // Fetch the user profile
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await adminApi.auth.getProfile();
-        setUser(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const handleNavClick = () => {
     setIsMenuOpen(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    toast.success("Logged out successfully");
-    navigate("/login");
   };
 
   // Define nav items
@@ -39,8 +17,6 @@ const Navbar = () => {
     { path: "/about", label: "About Us" },
     { path: "/services", label: "Services" },
     { path: "/contact", label: "Contact Us" },
-
-    // { path: "/logout", label: "Logout", isLogout: true },
   ];
 
   return (
@@ -63,37 +39,27 @@ const Navbar = () => {
                 }}
               />
               <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
-              ANOWER LOGISTICS
+                ANOWER LOGISTICS
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) =>
-              item.isLogout ? (
-                <button
-                  key={item.label}
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                    (item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path))
-                      ? "text-red-600 bg-red-50 font-semibold"
-                      : "text-gray-700 hover:text-red-600 hover:bg-red-50"
-                  }`}
-                  onClick={handleNavClick}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                  (item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path))
+                    ? "text-red-600 bg-red-50 font-semibold"
+                    : "text-gray-700 hover:text-red-600 hover:bg-red-50"
+                }`}
+                onClick={handleNavClick}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           {/* Mobile menu button */}
@@ -122,30 +88,20 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-lg rounded-b-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navItems.map((item) =>
-              item.isLogout ? (
-                <button
-                  key={item.label}
-                  onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50"
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    (item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path))
-                      ? "text-red-600 bg-red-50 font-semibold"
-                      : "text-gray-700 hover:text-red-600 hover:bg-red-50"
-                  }`}
-                  onClick={handleNavClick}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  (item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path))
+                    ? "text-red-600 bg-red-50 font-semibold"
+                    : "text-gray-700 hover:text-red-600 hover:bg-red-50"
+                }`}
+                onClick={handleNavClick}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       )}

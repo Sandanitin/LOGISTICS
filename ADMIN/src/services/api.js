@@ -9,13 +9,10 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to add the auth token to requests
+// Add a request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Add any global request headers here if needed
     return config;
   },
   (error) => {
@@ -27,56 +24,31 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      window.location.href = '/login';
-    }
+    // Handle any global response errors here
     return Promise.reject(error);
   }
 );
 
 const adminApi = {
-  // Auth
-  auth: {
-    register: (userData) => api.post('/api/auth/register', userData),
-    login: (credentials) => api.post('/api/auth/login', credentials),
-    logout: () => api.post('/api/auth/logout'),
-    getProfile: () => api.get('/api/users/profile'),
-  },
-
-  // Users
-  users: {
-    getAll: () => api.get('/api/users'),
-    getById: (id) => api.get(`/api/users/${id}`),
-    create: (data) => api.post('/api/users', data),
-    update: (id, data) => api.put(`/api/users/${id}`, data),
-    updateStatus: (id, isActive) => api.put(`/api/users/${id}/status`, { isActive }),
-    delete: (id) => api.delete(`/api/users/${id}`)
-  },
-
   // Products
   products: {
     getAll: () => api.get('/api/products'),
     getById: (id) => api.get(`/api/products/${id}`),
     create: (formData) => {
-      const token = localStorage.getItem('adminToken');
-      return api.post('/api/products', formData, {
+      const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        },
+      };
+      return api.post('/api/products', formData, config);
     },
     update: (id, formData) => {
-      const token = localStorage.getItem('adminToken');
-      return api.put(`/api/products/${id}`, formData, {
+      const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        },
+      };
+      return api.put(`/api/products/${id}`, formData, config);
     },
     delete: (id) => api.delete(`/api/products/${id}`),
   },
@@ -85,19 +57,18 @@ const adminApi = {
   orders: {
     getAll: () => api.get('/api/orders'),
     getById: (id) => api.get(`/api/orders/${id}`),
-    updateStatus: (id, status) => api.put(`/api/orders/${id}/status`, { status }),
+    updateStatus: (id, status) => api.patch(`/api/orders/${id}/status`, { status }),
   },
 
   // Subscriptions
   subscriptions: {
     getAll: () => api.get('/api/subscriptions'),
     getById: (id) => api.get(`/api/subscriptions/${id}`),
-    updateStatus: (id, status) => api.put(`/api/subscriptions/${id}/status`, { status }),
+    updateStatus: (id, status) => api.patch(`/api/subscriptions/${id}/status`, { status }),
     cancel: (id) => api.post(`/api/subscriptions/${id}/cancel`),
     pause: (id) => api.post(`/api/subscriptions/${id}/pause`),
     resume: (id) => api.post(`/api/subscriptions/${id}/resume`),
   },
-
 };
 
-export default adminApi; 
+export default adminApi;

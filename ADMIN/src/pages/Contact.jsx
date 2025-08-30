@@ -118,7 +118,7 @@ const Contact = () => {
       </svg>
       ),
       title: 'Email',
-      description: 'info@maammaruchulu.com'
+      description: 'info@.com'
     }
   ];
 
@@ -241,7 +241,7 @@ const Contact = () => {
           {/* Map */}
           <div className="mt-12 h-64 bg-gray-100 rounded-lg overflow-hidden">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.001036665166!2d77.4906!3d12.9724!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDU4JzIwLjYiTiA3N8KwMjknMjYuNiJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3098.033948225112!2d-94.7076099!3d38.9721375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87c0eb5e198a081f%3A0x5415ed11411aa071!2s8630%20Melrose%20St%2C%20Overland%20Park%2C%20KS%2066214%2C%20USA!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s"
               width="100%"
               height="100%"
               style={{ border: 0 }}
