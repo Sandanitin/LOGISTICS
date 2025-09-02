@@ -45,6 +45,34 @@ const About = () => {
               </div>
             </div>
 
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Leadership</h2>
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row gap-8">
+                  <div className="md:w-1/3 flex items-center justify-center">
+                    <img 
+                      src="images/owner.jpg" 
+                      alt="Anower Hossen" 
+                      className="w-full max-w-xs h-auto rounded-lg object-cover shadow-md"
+                      style={{ minHeight: '250px' }}
+                    />
+                  </div>
+                  <div className="md:w-2/3 text-gray-600 text-lg">
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Anower Hossen</h3>
+                    <p className="mb-4">
+                      With extensive experience in the medical courier industry, Anower Hossen brings a wealth of knowledge and expertise to our team. His deep understanding of medical logistics and supply chain management has been instrumental in shaping our company's success.
+                    </p>
+                    <p className="mb-4">
+                      Anower is known for his commitment to excellence and has built a reputation for reliability and professionalism in the medical courier sector. His leadership has been pivotal in assembling and mentoring a team of highly skilled and educated drivers who share his dedication to providing exceptional service.
+                    </p>
+                    <p>
+                      Under Anower's guidance, our team maintains the highest standards of service, ensuring that medical supplies and specimens are handled with the utmost care and delivered with precision and efficiency.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-blue-50 p-8 rounded-lg">
               <h3 className="text-2xl font-semibold text-gray-800 mb-4">Get in Touch</h3>
               <div className="space-y-4">
