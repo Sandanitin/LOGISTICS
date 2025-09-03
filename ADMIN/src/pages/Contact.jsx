@@ -118,7 +118,7 @@ const Contact = () => {
       </svg>
       ),
       title: 'Email',
-      description: 'info@.com'
+      description: 'hosenanowercy@gmail.com '
     }
   ];
 
