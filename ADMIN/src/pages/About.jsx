@@ -10,6 +10,11 @@ const About = () => {
           <div className="w-24 h-1 bg-white mx-auto mb-8"></div>
           <p className="text-xl md:text-2xl max-w-4xl mx-auto">
             Your Trusted Partner in Medical Courier Services
+            <div className="mt-6 text-lg text-gray-200 space-y-2">
+              <div>Capital Express</div>
+              <div>Henry Industries</div>
+              <div>Stream Line Logistics</div>
+            </div>
           </p>
         </div>
       </section>
@@ -110,13 +115,6 @@ const About = () => {
           </Link>
         </div>
       </section>
-      
-      {/* Footer Note */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="container mx-auto px-6 text-center text-sm">
-          <p> {new Date().getFullYear()} by A&A Medical. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -1,10 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
-
-// Use environment variable if available, otherwise default to local development
-const url = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// For production deployment, set VITE_API_URL in your build environment to "https://logistics-tkej.onrender.com"
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +7,6 @@ const Contact = () => {
     subject: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({
     success: null,
     message: ''
@@ -52,43 +45,31 @@ const Contact = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-    setSubmitStatus({ success: null, message: '' });
 
-    try {
-      const response = await axios.post(`${url}/api/contact`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true
-      });
-      
-      setSubmitStatus({ 
-        success: true, 
-        message: 'Your message has been sent successfully! We will get back to you soon.' 
-      });
-      
-      // Reset form on successful submission
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setSubmitStatus({ 
-        success: false, 
-        message: error.response?.data?.message || 'Failed to send message. Please try again later.'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    const { name, email, subject, message } = formData;
+    const mailtoLink = `mailto:hosenanowercy@gmail.com?subject=${encodeURIComponent(subject || 'Contact Form Submission')}&body=${encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+    )}`;
+
+    // Open default email client
+    window.location.href = mailtoLink;
+    
+    // Show success message
+    setSubmitStatus({ 
+      success: true, 
+      message: 'For immediate assistance, please call us at (913) 203-7254.'
+    });
+    
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      subject: '',
+      message: ''
+    });
   };
 
   const contactInfo = [
@@ -99,7 +80,11 @@ const Contact = () => {
       </svg>
       ),
       title: 'Phone',
-      description: '9132037254'
+      description: (
+        <a href="tel:9132037254" className="hover:underline">
+          913-203-7254
+        </a>
+      )
     },
     {
       icon: (
@@ -160,7 +145,6 @@ const Contact = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                disabled={isSubmitting}
               />
             </div>
             
@@ -175,7 +159,6 @@ const Contact = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                disabled={isSubmitting}
               />
             </div>
             
@@ -190,7 +173,6 @@ const Contact = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                disabled={isSubmitting}
               />
             </div>
             
@@ -205,18 +187,14 @@ const Contact = () => {
                 value={formData.message}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                disabled={isSubmitting}
               ></textarea>
             </div>
             
             <button
               type="submit"
-              disabled={isSubmitting}
-              className={`w-full py-3 px-6 rounded-md text-white font-medium ${
-                isSubmitting ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-              } transition-colors`}
+              className="w-full py-3 px-6 rounded-md text-white font-medium bg-red-600 hover:bg-red-700 transition-colors"
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              Send Message
             </button>
           </form>
         </div>
