@@ -1,10 +1,10 @@
-import { Suspense, lazy, useEffect } from 'react';
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Suspense, lazy, useEffect, useState } from 'react';
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LoadingSpinner from "./components/common/LoadingSpinner";
-import { isMobile } from './utils/deviceUtils';
+import { useScrollToTop } from './hooks/useScrollToTop';
 
 // Lazy load route components
 const Home = lazy(() => import('./pages/Home'));
@@ -20,72 +20,54 @@ const PageLoader = () => (
 );
 
 const App = () => {
-  const location = useLocation();
-  const mobile = isMobile();
+  // Use the custom scroll to top hook
+  useScrollToTop();
+  
+  // Mobile detection state
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Add mobile class to body if on mobile
+  // Check if device is mobile
   useEffect(() => {
-    if (mobile) {
-      document.body.classList.add('mobile-device');
-      return () => {
-        document.body.classList.remove('mobile-device');
-      };
-    }
-  }, [mobile]);
-
-  // Enhanced scroll to top on route change
-  useEffect(() => {
-    const scrollToTop = () => {
-      try {
-        // Try smooth scrolling first
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'smooth'
-        });
-        
-        // Fallback for browsers that don't support smooth scrolling
-        if (window.scrollY > 0) {
-          const scrollStep = -window.scrollY / 20;
-          const scrollInterval = setInterval(() => {
-            if (window.scrollY <= 0) {
-              clearInterval(scrollInterval);
-            } else {
-              window.scrollBy(0, scrollStep);
-            }
-          }, 15);
-        }
-      } catch (error) {
-        // Final fallback for any errors
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }
+    const checkIfMobile = () => {
+      const userAgent = typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      setIsMobile(mobile);
     };
 
-    // Small delay to ensure the new page has started rendering
-    const timer = setTimeout(scrollToTop, 50);
+    // Initial check
+    checkIfMobile();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile);
     
-    // Cleanup function
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  // Add/remove mobile class to body
+  useEffect(() => {
+    if (isMobile) {
+      document.body.classList.add('mobile-device');
+    } else {
+      document.body.classList.remove('mobile-device');
+    }
+    
     return () => {
-      clearTimeout(timer);
-      // Clear any existing scroll intervals
-      const scrollIntervals = window.__scrollIntervals || [];
-      scrollIntervals.forEach(interval => clearInterval(interval));
-      window.__scrollIntervals = [];
+      document.body.classList.remove('mobile-device');
     };
-  }, [location.pathname]);
+  }, [isMobile]);
 
   return (
     <div className="app-container">
       <Toaster 
-        position={mobile ? "top-center" : "top-right"} 
+        position={isMobile ? "top-center" : "top-right"} 
         toastOptions={{
           duration: 4000,
           style: {
-            fontSize: mobile ? '14px' : '16px',
-            padding: mobile ? '12px 16px' : '16px 24px',
-            margin: mobile ? '8px' : '0',
-            maxWidth: mobile ? '90%' : '420px',
+            fontSize: isMobile ? '14px' : '16px',
+            padding: isMobile ? '12px 16px' : '16px 24px',
+            margin: isMobile ? '8px' : '0',
+            maxWidth: isMobile ? '90%' : '420px',
           },
         }}
       />
