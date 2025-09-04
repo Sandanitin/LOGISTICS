@@ -1,18 +1,66 @@
-// Performance monitoring and optimization utilities
+/**
+ * Performance Monitoring Utility
+ * Provides methods for measuring and monitoring application performance.
+ */
 
-export const mark = (name) => {
-  if (window.performance?.mark) {
-    performance.mark(`mark_${name}_start`);
-  }
-  return performance.now();
+// Check if the Performance API is available
+const isPerformanceAvailable = () => {
+  return (
+    typeof window !== 'undefined' &&
+    'performance' in window &&
+    typeof window.performance.mark === 'function' &&
+    typeof window.performance.measure === 'function'
+  );
 };
 
+/**
+ * Creates a performance mark
+ * @param {string} name - The name of the mark
+ */
+export const mark = (name) => {
+  if (!isPerformanceAvailable()) return;
+  
+  try {
+    performance.mark(`mark_${name}_start`);
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`Failed to create mark: ${name}`, e);
+    }
+  }
+};
+
+/**
+ * Measures the duration between two marks
+ * @param {string} name - The name of the measure
+ * @param {string} startMark - The name of the starting mark
+ * @param {string} endMark - The name of the ending mark
+ */
 export const measure = (name, startMark, endMark) => {
-  if (window.performance?.measure) {
-    performance.measure(name, `mark_${startMark}_start`, `mark_${endMark}_end`);
-    performance.clearMarks(`mark_${startMark}_start`);
-    performance.clearMarks(`mark_${endMark}_end`);
-    performance.clearMeasures(name);
+  if (!isPerformanceAvailable()) return;
+  
+  try {
+    const startMarkName = `mark_${startMark}_start`;
+    const endMarkName = `mark_${endMark}_start`;
+    
+    // Check if marks exist before measuring
+    const marks = performance.getEntriesByType('mark');
+    const hasStartMark = marks.some(mark => mark.name === startMarkName);
+    const hasEndMark = marks.some(mark => mark.name === endMarkName);
+    
+    if (hasStartMark && hasEndMark) {
+      performance.measure(name, startMarkName, endMarkName);
+      
+      // Clean up marks to avoid buffer overflow
+      performance.clearMarks(startMarkName);
+      performance.clearMarks(endMarkName);
+      performance.clearMeasures(name);
+    } else if (process.env.NODE_ENV === 'development') {
+      console.warn(`Could not measure ${name}: marks not found`);
+    }
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`Failed to measure ${name}`, e);
+    }
   }
 };
 
@@ -147,6 +195,17 @@ export const reportWebVitals = (onPerfEntry) => {
   }
 };
 
+// Initialize all performance monitoring
+export const initPerformanceMonitoring = () => {
+  if (process.env.NODE_ENV === 'production') {
+    observeLongTasks();
+    observeLayoutShifts();
+    observeLCP((entry) => {
+      console.log('LCP:', entry);
+    });
+  }
+};
+
 export default {
   mark,
   measure,
@@ -155,5 +214,6 @@ export default {
   debounce,
   throttle,
   measureTTI,
-  reportWebVitals
+  reportWebVitals,
+  initPerformanceMonitoring
 };

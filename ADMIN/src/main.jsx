@@ -1,8 +1,9 @@
-import { StrictMode, lazy, Suspense } from 'react';
+import { StrictMode, lazy, Suspense, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { mark, measure, observeLongTasks } from './utils/performance';
+import { mark, measure } from './utils/performance';
+import { initFontLoading, loadNonCriticalCSS } from './utils/fontLoader';
 import { setViewportHeight, preventDoubleTapZoom, isMobile } from './utils/mobileUtils';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import './index.css';
@@ -15,68 +16,62 @@ const MobileLayout = lazy(() => import('./components/MobileLayout'));
 // Mark the start of the application
 mark('app-start');
 
-// Initialize performance monitoring
-const initPerformance = () => {
-  if (process.env.NODE_ENV === 'production') {
-    observeLongTasks();
-  }
-};
-
-// Initialize mobile optimizations
-const initMobileOptimizations = () => {
+// Initialize performance monitoring and optimizations
+const initApp = () => {
+  // Initialize mobile optimizations
   setViewportHeight();
   preventDoubleTapZoom();
   
-  if (isMobile()) {
-    document.body.classList.add('mobile-device');
+  // Initialize font loading and critical CSS
+  initFontLoading();
+  
+  // Load non-critical CSS after initial render
+  if (document.readyState === 'complete') {
+    loadNonCriticalCSS();
+  } else {
+    window.addEventListener('load', loadNonCriticalCSS, { once: true });
   }
+
+  // Mark app as initialized
+  mark('app-initialized');
 };
 
 // Initialize the application
-const initApp = async () => {
-  try {
-    initPerformance();
-    initMobileOptimizations();
+initApp();
 
-    const root = createRoot(document.getElementById('root'));
-    
-    root.render(
-      <StrictMode>
-        <BrowserRouter>
-          <Suspense fallback={
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-              width: '100%'
-            }}>
-              <LoadingSpinner size="large" />
-            </div>
-          }>
-            <MobileLayout>
-              <App />
-              <SpeedInsights />
-            </MobileLayout>
-          </Suspense>
-        </BrowserRouter>
-      </StrictMode>
-    );
+// Create root
+const root = createRoot(document.getElementById('root'));
 
-    mark('app-loaded');
-    measure('app-boot', 'app-start', 'app-loaded');
-  } catch (error) {
-    console.error('Failed to initialize application:', error);
-  }
-};
-
-// Start the application
-initApp().catch(console.error);
+// Render the app
+root.render(
+  <StrictMode>
+    <BrowserRouter>
+      <Suspense 
+        fallback={
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            width: '100%',
+          }}>
+            <LoadingSpinner size="large" />
+          </div>
+        }
+      >
+        {isMobile() ? <MobileLayout /> : <App />}
+        {process.env.NODE_ENV === 'production' && <SpeedInsights debug={false} />}
+      </Suspense>
+    </BrowserRouter>
+  </StrictMode>
+);
 
 // Log performance metrics in development
-if (process.env.NODE_ENV !== 'production') {
-  window.addEventListener('load', () => {
-    const { logMetrics } = import('./utils/performance');
-    logMetrics();
-  });
+if (process.env.NODE_ENV === 'development') {
+  console.log('Development mode - performance monitoring active');
+  // Only measure if we're in production
+  if (process.env.NODE_ENV === 'production') {
+    mark('app-rendered');
+    measure('app-boot', 'app-start', 'app-rendered');
+  }
 }
