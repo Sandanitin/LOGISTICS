@@ -9,17 +9,24 @@ const MobileLayout = ({ children }) => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Prevent zoom on mobile devices
+  // Prevent zoom on mobile devices but allow scrolling
   useEffect(() => {
     const handleTouchMove = (e) => {
-      if (e.scale !== 1) {
+      // Only prevent default for multi-touch (pinch zoom)
+      if (e.touches.length > 1) {
         e.preventDefault();
       }
     };
 
+    // Enable smooth scrolling on iOS
+    document.documentElement.style.webkitOverflowScrolling = 'touch';
+    
+    // Add passive: true for better scrolling performance
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    
     return () => {
       document.removeEventListener('touchmove', handleTouchMove);
+      document.documentElement.style.webkitOverflowScrolling = 'auto';
     };
   }, []);
 
@@ -27,11 +34,15 @@ const MobileLayout = ({ children }) => {
     <div 
       style={{
         WebkitOverflowScrolling: 'touch',
-        touchAction: 'manipulation',
+        touchAction: 'pan-y', // Allow vertical panning
         maxWidth: '100vw',
         overflowX: 'hidden',
         position: 'relative',
         minHeight: '100vh',
+        width: '100%',
+        height: '100%',
+        overflowY: 'auto', // Ensure vertical scrolling is enabled
+        WebkitBackfaceVisibility: 'hidden', // Fix for iOS rendering
       }}
     >
       {children}
