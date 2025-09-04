@@ -33,9 +33,46 @@ const App = () => {
     }
   }, [mobile]);
 
-  // Scroll to top on route change
+  // Enhanced scroll to top on route change
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const scrollToTop = () => {
+      try {
+        // Try smooth scrolling first
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+        
+        // Fallback for browsers that don't support smooth scrolling
+        if (window.scrollY > 0) {
+          const scrollStep = -window.scrollY / 20;
+          const scrollInterval = setInterval(() => {
+            if (window.scrollY <= 0) {
+              clearInterval(scrollInterval);
+            } else {
+              window.scrollBy(0, scrollStep);
+            }
+          }, 15);
+        }
+      } catch (error) {
+        // Final fallback for any errors
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+    };
+
+    // Small delay to ensure the new page has started rendering
+    const timer = setTimeout(scrollToTop, 50);
+    
+    // Cleanup function
+    return () => {
+      clearTimeout(timer);
+      // Clear any existing scroll intervals
+      const scrollIntervals = window.__scrollIntervals || [];
+      scrollIntervals.forEach(interval => clearInterval(interval));
+      window.__scrollIntervals = [];
+    };
   }, [location.pathname]);
 
   return (
