@@ -3,9 +3,8 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import LoadingSpinner from './components/common/LoadingSpinner';
-import { setViewportHeight, preventDoubleTapZoom, isMobile } from './utils/mobileUtils';
-import './styles/mobile.css';
+import LoadingSpinner from "./components/common/LoadingSpinner";
+import { isMobile } from './utils/deviceUtils';
 
 // Lazy load route components
 const Home = lazy(() => import('./pages/Home'));
@@ -22,22 +21,17 @@ const PageLoader = () => (
 
 const App = () => {
   const location = useLocation();
+  const mobile = isMobile();
 
-  // Initialize mobile optimizations
+  // Add mobile class to body if on mobile
   useEffect(() => {
-    const cleanupViewport = setViewportHeight();
-    const cleanupTapZoom = preventDoubleTapZoom();
-    
-    if (isMobile()) {
+    if (mobile) {
       document.body.classList.add('mobile-device');
+      return () => {
+        document.body.classList.remove('mobile-device');
+      };
     }
-
-    return () => {
-      cleanupViewport();
-      cleanupTapZoom();
-      document.body.classList.remove('mobile-device');
-    };
-  }, []);
+  }, [mobile]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -47,19 +41,19 @@ const App = () => {
   return (
     <div className="app-container">
       <Toaster 
-        position={isMobile() ? "top-center" : "top-right"} 
+        position={mobile ? "top-center" : "top-right"} 
         toastOptions={{
           duration: 4000,
           style: {
-            fontSize: isMobile() ? '14px' : '16px',
-            padding: isMobile() ? '12px 16px' : '16px 24px',
-            margin: isMobile() ? '8px' : '0',
-            maxWidth: isMobile() ? '90%' : '420px',
+            fontSize: mobile ? '14px' : '16px',
+            padding: mobile ? '12px 16px' : '16px 24px',
+            margin: mobile ? '8px' : '0',
+            maxWidth: mobile ? '90%' : '420px',
           },
         }}
       />
       <Navbar />
-      <main className="main-content">
+      <main className="flex-grow">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
