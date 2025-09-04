@@ -16,7 +16,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 // Loading component for Suspense fallback
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
-    <LoadingSpinner size="lg" />
+    <LoadingSpinner size="large" />
   </div>
 );
 
