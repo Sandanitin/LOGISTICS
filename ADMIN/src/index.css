@@ -2,27 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import full-bleed styles */
+@import './styles/full-bleed.css';
+
+/* Reset base styles */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
 }
 
-body {
+/* Base reset */
+*,
+*::before,
+*::after {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* Remove default margin and padding from body and html */
+html,
+body,
 #root {
+  margin: 0 !important;
+  padding: 0 !important;
   width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-@layer base {
-  html {
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+/* Ensure full width for the root element */
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Full-bleed utility */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+/* Image styles */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.main-container {
+  @apply max-w-full overflow-x-hidden;
+}
+
+.section-full {
+  @apply w-full min-h-screen;
 }
 
 @layer components {

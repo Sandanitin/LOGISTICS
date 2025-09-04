@@ -1,0 +1,78 @@
+/* Prevent layout shifts */
+
+/* 1. Reserve space for fonts */
+html {
+  visibility: hidden;
+}
+
+html.fonts-loaded {
+  visibility: visible;
+}
+
+/* 2. Add smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 3. Reserve space for images */
+img, svg, video, canvas, picture {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 4. Prevent content reflow when scrollbar appears */
+html {
+  margin-left: calc(100vw - 100%);
+  margin-right: 0;
+}
+
+/* 5. Add smooth transitions for dynamic content */
+* {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 6. Fix for cumulative layout shift on dynamic content */
+[style*='--aspect-ratio'] {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: calc(100% / (var(--aspect-ratio)));
+}
+
+[style*='--aspect-ratio'] > :first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 7. Smooth loading for images */
+img {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+img.loaded {
+  opacity: 1;
+}
+
+/* 8. Reserve space for ads and embeds */
+.ad-container, .embed-container, iframe {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* 9. Fix for font loading */
+@font-face {
+  font-family: 'YourFont';
+  font-display: swap;
+  src: url('/path/to/your/font.woff2') format('woff2');
+}
+
+/* 10. Smooth state changes */
+button, a, input, textarea, select {
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
