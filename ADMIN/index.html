@@ -1,20 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Basic Meta Tags -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="ANOWER LOGISTICS - Professional logistics and transportation services. Fast, reliable, and efficient delivery solutions for your business needs." />
-    <meta name="keywords" content="logistics, transportation, delivery, shipping, freight, ANOWER LOGISTICS" />
-    <meta name="author" content="ANOWER LOGISTICS" />
-    <meta name="robots" content="index, follow" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/images/logo.png" />
-    <link rel="apple-touch-icon" href="/images/logo.png" />
+    <meta name="description" content="ANOWER LOGISTICS - Professional logistics and transportation services" />
     
     <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://logistics-tkej.onrender.com" />
     
@@ -22,21 +14,74 @@
     <link 
       rel="preload" 
       href="/src/index.css" 
-      as="style" 
+      as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript><link rel="stylesheet" href="/src/index.css" /></noscript>
-    
-    <!-- Load fonts with font-display: swap -->
+
+    <!-- Preload critical fonts -->
     <link 
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
-      rel="stylesheet"
-      media="print" 
-      onload="this.media='all'"
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
     
-    <!-- Title -->
-    <title>ANOWER LOGISTICS | Professional Logistics & Transportation Services</title>
+    <!-- Inline critical CSS -->
+    <style id="critical-css">
+      /* Critical CSS for above-the-fold content */
+      :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+      
+      /* Loading state */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Prevent layout shifts */
+      img, video, iframe {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      /* Smooth font loading */
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7W0Q5n-wU.woff2') format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+    </style>
+    
+    <title>ANOWER LOGISTICS | Professional Logistics Services</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/images/logo.png" as="image" />
+    
+    <!-- Preload LCP elements -->
+    <link 
+      rel="preload" 
+      href="/images/hero-image.jpg" 
+      as="image"
+      media="(max-width: 1024px)"
+    />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -77,56 +122,20 @@
       ]
     }
     </script>
-    
-    <!-- Inline critical CSS -->
-    <style>
-      /* Critical CSS for above-the-fold content */
-      :root {
-        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      }
-      
-      body {
-        margin: 0;
-        font-family: var(--font-sans);
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-        min-height: 100vh;
-      }
-      
-      /* Loading state */
-      #root {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-    </style>
   </head>
   <body>
     <div id="root">
-      <!-- Loading state -->
       <div style="display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%;">
         <div>Loading...</div>
       </div>
     </div>
     
-    <!-- Preload the logo -->
-    <link rel="preload" href="/images/logo.png" as="image" />
-    
-    <!-- Preload the logo for better LCP -->
+    <!-- Load non-critical CSS -->
     <link 
-      rel="preload" 
-      href="/images/logo.png" 
-      as="image"
-      imagesrcset="/images/logo.png"
-      imagesizes="150px"
-    >
-    
-    <!-- Fallback for browsers that don't support imagesrcset -->
-    <img 
-      src="/images/logo.png" 
-      alt="ANOWER LOGISTICS Logo"
-      style="display: none;"
-      loading="eager"
+      rel="stylesheet" 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
     
     <script type="module" src="/src/main.jsx"></script>
