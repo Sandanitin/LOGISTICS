@@ -1,4 +1,4 @@
-import { StrictMode, lazy, Suspense, useEffect } from 'react';
+import { StrictMode, lazy, Suspense, useEffect, startTransition } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -9,62 +9,77 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import './index.css';
 import './styles/mobile.css';
 
-// Lazy load heavy components
-const App = lazy(() => import('./App'));
-const MobileLayout = lazy(() => import('./components/MobileLayout'));
-
 // Mark the start of the application
 mark('app-start');
 
+// Lazy load heavy components with prefetching
+const App = lazy(() => 
+  Promise.all([
+    import('./App'),
+    // Only preload existing CSS files
+    import('./index.css')
+  ]).then(([moduleExports]) => moduleExports)
+);
+
+const MobileLayout = lazy(() => import('./components/MobileLayout'));
+
 // Initialize performance monitoring and optimizations
 const initApp = () => {
+  // Mark the start of initialization
+  mark('app_init');
+
   // Initialize mobile optimizations
-  setViewportHeight();
-  preventDoubleTapZoom();
-  
-  // Initialize font loading and critical CSS
-  initFontLoading();
-  
-  // Load non-critical CSS after initial render
-  if (document.readyState === 'complete') {
-    loadNonCriticalCSS();
-  } else {
-    window.addEventListener('load', loadNonCriticalCSS, { once: true });
+  if (typeof window !== 'undefined') {
+    setViewportHeight();
+    preventDoubleTapZoom();
+    
+    // Initialize font loading and critical CSS
+    initFontLoading();
+    
+    // Load non-critical CSS after initial render
+    const loadNonCritical = () => {
+      requestIdleCallback(() => {
+        loadNonCriticalCSS();
+      });
+    };
+
+    if (document.readyState === 'complete') {
+      loadNonCritical();
+    } else {
+      window.addEventListener('load', loadNonCritical, { once: true });
+    }
   }
 
-  // Mark app as initialized
-  mark('app-initialized');
+  // Measure initialization time using a single mark (time since page load)
+  if (typeof window !== 'undefined' && window.performance) {
+    performance.measure('app_initialization', 'navigationStart');
+  }
 };
 
 // Initialize the application
 initApp();
 
-// Create root
-const root = createRoot(document.getElementById('root'));
+// Create root with concurrent features
+const container = document.getElementById('root');
+const root = createRoot(container, { identifierPrefix: 'logistics-admin-' });
 
-// Render the app
-root.render(
-  <StrictMode>
-    <BrowserRouter>
-      <Suspense 
-        fallback={
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            width: '100%',
-          }}>
+// Render the app with concurrent rendering
+startTransition(() => {
+  root.render(
+    <StrictMode>
+      <BrowserRouter>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen">
             <LoadingSpinner size="large" />
           </div>
-        }
-      >
-        {isMobile() ? <MobileLayout /> : <App />}
-        {process.env.NODE_ENV === 'production' && <SpeedInsights debug={false} />}
-      </Suspense>
-    </BrowserRouter>
-  </StrictMode>
-);
+        }>
+          {isMobile() ? <MobileLayout /> : <App />}
+          {process.env.NODE_ENV === 'production' && <SpeedInsights debug={false} />}
+        </Suspense>
+      </BrowserRouter>
+    </StrictMode>
+  );
+});
 
 // Log performance metrics in development
 if (process.env.NODE_ENV === 'development') {
