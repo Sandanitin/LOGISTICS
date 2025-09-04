@@ -14,6 +14,7 @@
   "dependencies": {
     "@heroicons/react": "^2.1.1",
     "@tailwindcss/forms": "^0.5.7",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
     "framer-motion": "^10.18.0",
