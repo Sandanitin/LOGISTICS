@@ -4,11 +4,7 @@ import { useLocation } from 'react-router-dom';
 const MobileLayout = ({ children }) => {
   const location = useLocation();
 
-  // Reset scroll position on route change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
+  /
   // Prevent zoom on mobile devices but allow scrolling
   useEffect(() => {
     const handleTouchMove = (e) => {
@@ -18,22 +14,21 @@ const MobileLayout = ({ children }) => {
       }
     };
 
-    // Enable smooth scrolling on iOS
-    document.documentElement.style.webkitOverflowScrolling = 'touch';
+    
     
     // Add passive: true for better scrolling performance
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     return () => {
       document.removeEventListener('touchmove', handleTouchMove);
-      document.documentElement.style.webkitOverflowScrolling = 'auto';
+     
     };
   }, []);
 
   return (
     <div 
       style={{
-        WebkitOverflowScrolling: 'touch',
+      
         touchAction: 'pan-y', // Allow vertical panning
         maxWidth: '100vw',
         overflowX: 'hidden',

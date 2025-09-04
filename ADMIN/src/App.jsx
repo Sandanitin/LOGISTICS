@@ -21,11 +21,6 @@ const PageLoader = () => (
 const App = () => {
   const location = useLocation();
   
-  // Simple scroll to top on route change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
   return (
     <div className="app-container">
       <Toaster position="top-right" />
