@@ -10,12 +10,14 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react({
-        // Enable Fast Refresh
-        fastRefresh: true,
+        // Only enable fast refresh in development
+        fastRefresh: !isProduction,
         // Only include React specific babel transforms in production
         babel: isProduction ? {
           plugins: [
-            ['babel-plugin-jsx-remove-data-test-id', { attributes: ['data-testid'] }]
+            ['babel-plugin-jsx-remove-data-test-id', { attributes: ['data-testid'] }],
+            'babel-plugin-lodash',
+            'babel-plugin-transform-remove-console',
           ]
         } : {}
       }),
@@ -49,11 +51,17 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: (id) => {
             if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom')) {
+              // Group React and related packages
+              if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler') || id.includes('scheduler/')) {
                 return 'vendor-react';
               }
-              if (id.includes('@chakra-ui')) {
-                return 'vendor-chakra';
+              // Group UI libraries
+              if (id.includes('@chakra-ui') || id.includes('@emotion') || id.includes('framer-motion')) {
+                return 'vendor-ui';
+              }
+              // Group utility libraries
+              if (id.includes('lodash') || id.includes('date-fns') || id.includes('axios')) {
+                return 'vendor-utils';
               }
               return 'vendor';
             }
@@ -64,7 +72,7 @@ export default defineConfig(({ mode }) => {
         compress: {
           drop_console: isProduction,
           drop_debugger: isProduction,
-          pure: ['console.log', 'console.info'],
+          pure: ['console.log', 'console.info', 'console.warn'],
         },
         format: {
           comments: false,
@@ -106,6 +114,7 @@ export default defineConfig(({ mode }) => {
     // Optimize deps for better caching
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],
+      exclude: [],
       esbuildOptions: {
         // Enable esbuild's tree shaking
         treeShaking: true,
