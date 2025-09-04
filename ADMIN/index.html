@@ -109,13 +109,21 @@
       </div>
     </div>
     
-    <!-- Preload only the standard resolution logo -->
+    <!-- Preload the logo -->
     <link rel="preload" href="/images/logo.png" as="image" />
     
-    <!-- Responsive images with srcset for the actual image element -->
+    <!-- Preload the logo for better LCP -->
+    <link 
+      rel="preload" 
+      href="/images/logo.png" 
+      as="image"
+      imagesrcset="/images/logo.png"
+      imagesizes="150px"
+    >
+    
+    <!-- Fallback for browsers that don't support imagesrcset -->
     <img 
       src="/images/logo.png" 
-      srcset="/images/logo.png 1x, /images/logo@2x.png 2x"
       alt="ANOWER LOGISTICS Logo"
       style="display: none;"
       loading="eager"
