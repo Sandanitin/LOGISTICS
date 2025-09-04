@@ -10,9 +10,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react({
-        // Only enable fast refresh in development
         fastRefresh: !isProduction,
-        // Only include React specific babel transforms in production
         babel: isProduction ? {
           plugins: [
             ['babel-plugin-jsx-remove-data-test-id', { attributes: ['data-testid'] }],
@@ -47,12 +45,13 @@ export default defineConfig(({ mode }) => {
       minify: isProduction ? 'terser' : false,
       cssMinify: isProduction,
       chunkSizeWarningLimit: 1000,
+      reportCompressedSize: true,
       rollupOptions: {
         output: {
           manualChunks: (id) => {
             if (id.includes('node_modules')) {
               // Group React and related packages
-              if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler') || id.includes('scheduler/')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
                 return 'vendor-react';
               }
               // Group UI libraries
@@ -78,16 +77,12 @@ export default defineConfig(({ mode }) => {
           comments: false,
         },
       },
-      // Enable brotli and gzip compression
-      reportCompressedSize: true,
-      chunkSizeWarningLimit: 1000,
     },
 
     server: {
       port: 3000,
       open: true,
       host: true,
-      // Enable HMR with faster updates
       hmr: {
         overlay: false,
       },
@@ -103,7 +98,6 @@ export default defineConfig(({ mode }) => {
       modules: {
         generateScopedName: isProduction ? '[hash:base64:5]' : '[name]__[local]',
       },
-      // Enable CSS code splitting
       preprocessorOptions: {
         scss: {
           additionalData: `@import "@/styles/variables.scss";`,
@@ -111,17 +105,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     
-    // Optimize deps for better caching
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],
       exclude: [],
       esbuildOptions: {
-        // Enable esbuild's tree shaking
         treeShaking: true,
       },
     },
     
-    // Enable build caching for faster rebuilds
     cacheDir: `./node_modules/.vite`,
   };
 });
