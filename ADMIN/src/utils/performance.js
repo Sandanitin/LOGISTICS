@@ -1,188 +1,159 @@
-/**
- * Performance monitoring and measurement utilities
- */
+// Performance monitoring and optimization utilities
 
-// Performance metrics storage
-const metrics = {
-  navigationStart: performance.now(),
-  marks: {},
-  measures: {},
-};
-
-/**
- * Marks a specific point in time for performance measurement
- * @param {string} name - Name of the mark
- */
 export const mark = (name) => {
-  if (typeof performance !== 'undefined' && performance.mark) {
-    performance.mark(name);
-    metrics.marks[name] = performance.now();
+  if (window.performance?.mark) {
+    performance.mark(`mark_${name}_start`);
   }
+  return performance.now();
 };
 
-/**
- * Measures the duration between two marks
- * @param {string} name - Name of the measure
- * @param {string} startMark - Name of the starting mark
- * @param {string} endMark - Name of the ending mark
- */
 export const measure = (name, startMark, endMark) => {
-  if (typeof performance !== 'undefined' && performance.measure) {
-    try {
-      performance.measure(name, startMark, endMark);
-      const measures = performance.getEntriesByName(name, 'measure');
-      const lastMeasure = measures[measures.length - 1];
-      metrics.measures[name] = lastMeasure.duration;
-      return lastMeasure.duration;
-    } catch (e) {
-      console.warn(`Failed to measure ${name}:`, e);
-      return 0;
-    }
-  }
-  return 0;
-};
-
-/**
- * Gets the time since navigation start
- * @returns {number} Time in milliseconds
- */
-export const timeSinceNavigationStart = () => {
-  return performance.now() - metrics.navigationStart;
-};
-
-/**
- * Logs all performance marks and measures
- */
-export const logMetrics = () => {
-  if (process.env.NODE_ENV !== 'production') {
-    console.group('Performance Metrics');
-    
-    // Log marks
-    console.group('Marks');
-    Object.entries(metrics.marks).forEach(([name, time]) => {
-      console.log(`${name}: ${(time - metrics.navigationStart).toFixed(2)}ms`);
-    });
-    console.groupEnd();
-    
-    // Log measures
-    console.group('Measures');
-    Object.entries(metrics.measures).forEach(([name, duration]) => {
-      console.log(`${name}: ${duration.toFixed(2)}ms`);
-    });
-    console.groupEnd();
-    
-    // Log navigation timing
-    if ('performance' in window && performance.getEntriesByType) {
-      const navigation = performance.getEntriesByType('navigation')[0];
-      if (navigation) {
-        console.group('Navigation Timing');
-        console.log(`Page load: ${navigation.loadEventEnd - navigation.startTime}ms`);
-        console.log(`DOM Content Loaded: ${navigation.domContentLoadedEventEnd - navigation.startTime}ms`);
-        console.log(`TTFB: ${navigation.responseStart - navigation.requestStart}ms`);
-        console.groupEnd();
-      }
-    }
-    
-    console.groupEnd();
+  if (window.performance?.measure) {
+    performance.measure(name, `mark_${startMark}_start`, `mark_${endMark}_end`);
+    performance.clearMarks(`mark_${startMark}_start`);
+    performance.clearMarks(`mark_${endMark}_end`);
+    performance.clearMeasures(name);
   }
 };
 
-/**
- * Measures the time taken to execute a function
- * @param {Function} fn - Function to measure
- * @param {string} name - Name of the measurement
- * @returns {*} The result of the function
- */
-export const measureExecution = (fn, name = 'unnamed') => {
-  const start = performance.now();
-  const result = fn();
-  const end = performance.now();
-  
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`[Performance] ${name} took ${(end - start).toFixed(2)}ms`);
-  }
-  
-  metrics.measures[name] = end - start;
-  return result;
-};
-
-/**
- * Tracks long tasks using the Performance Observer API
- */
+// Monitor long tasks (tasks that take > 50ms)
 export const observeLongTasks = () => {
   if ('PerformanceObserver' in window) {
     const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        if (entry.duration > 50) { // Log tasks longer than 50ms
-          console.warn(`Long task detected: ${entry.duration.toFixed(2)}ms`, entry);
-        }
-      });
+      for (const entry of list.getEntries()) {
+        console.log('[Long Task]', entry);
+      }
     });
-    
     observer.observe({ entryTypes: ['longtask'] });
     return observer;
   }
   return null;
 };
 
-/**
- * Measures the time to interactive (TTI)
- * @returns {Promise<number>} Time to interactive in milliseconds
- */
+// Log performance metrics
+export const logMetrics = () => {
+  if (window.performance) {
+    // Log navigation timing
+    const timing = window.performance.timing;
+    if (timing) {
+      console.log('Navigation Timing:', {
+        dns: timing.domainLookupEnd - timing.domainLookupStart,
+        tcp: timing.connectEnd - timing.connectStart,
+        ttfb: timing.responseStart - timing.requestStart,
+        download: timing.responseEnd - timing.responseStart,
+        domLoaded: timing.domComplete - timing.domLoading,
+        total: timing.loadEventEnd - timing.navigationStart,
+      });
+    }
+
+    // Log web vitals
+    if (window.performance.getEntriesByType) {
+      const resources = performance.getEntriesByType('resource');
+      console.log('Resources loaded:', resources.length);
+      
+      // Log largest contentful paint
+      const paintEntries = performance.getEntriesByType('paint');
+      paintEntries.forEach(entry => {
+        console.log(`[${entry.name}] ${Math.round(entry.startTime)}ms`);
+      });
+    }
+  }
+};
+
+// Debounce function for performance-critical operations
+export const debounce = (func, wait, immediate = false) => {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    const later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
+// Throttle function for scroll/resize events
+export const throttle = (func, limit) => {
+  let inThrottle;
+  return function() {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+};
+
+// Measure time to interactive
 export const measureTTI = () => {
   return new Promise((resolve) => {
-    if ('PerformanceLongTaskTiming' in window) {
-      const ttiPolyfill = () => {
-        const tti = window.ttiPolyfill.getFirstConsistentlyInteractive();
-        if (tti) {
-          resolve(tti);
-          return true;
-        }
-        return false;
-      };
+    const ttiThreshold = 50; // ms of quiet time required to be considered TTI
+    const minTime = 5000; // Minimum time before we can consider TTI
+    const maxTime = 10000; // Maximum time to wait for TTI
+    
+    let lastLongTask = performance.now();
+    let ttiTimeout;
+    
+    const checkTTI = () => {
+      const now = performance.now();
+      const timeSinceLongTask = now - lastLongTask;
       
-      if (!ttiPolyfill()) {
-        const interval = setInterval(() => {
-          if (ttiPolyfill()) {
-            clearInterval(interval);
-          }
-        }, 100);
-      }
-    } else {
-      // Fallback to DOMContentLoaded if TTI polyfill is not available
-      if (document.readyState === 'complete') {
-        resolve(performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart);
+      if (timeSinceLongTask >= ttiThreshold && now >= minTime) {
+        // We've found TTI
+        clearTimeout(ttiTimeout);
+        resolve(Math.round(now));
       } else {
-        window.addEventListener('load', () => {
-          resolve(performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart);
-        });
+        // Keep checking
+        requestAnimationFrame(checkTTI);
       }
-    }
+    };
+    
+    // Set up long task observer
+    const observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        lastLongTask = Math.max(lastLongTask, entry.startTime + entry.duration);
+      }
+    });
+    
+    observer.observe({ entryTypes: ['longtask'] });
+    
+    // Start checking for TTI
+    requestAnimationFrame(checkTTI);
+    
+    // Set a maximum time to resolve
+    ttiTimeout = setTimeout(() => {
+      resolve(Math.round(performance.now()));
+    }, maxTime);
   });
 };
 
-// Initialize performance monitoring
-if (typeof window !== 'undefined') {
-  // Mark the initial load
-  mark('app-init');
-  
-  // Log metrics when the page is fully loaded
-  if (document.readyState === 'complete') {
-    mark('load');
-    measure('app-boot', 'app-init', 'load');
-    logMetrics();
-  } else {
-    window.addEventListener('load', () => {
-      mark('load');
-      measure('app-boot', 'app-init', 'load');
-      logMetrics();
+// Log web vitals
+export const reportWebVitals = (onPerfEntry) => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
     });
   }
-  
-  // Log when the page is being unloaded
-  window.addEventListener('beforeunload', () => {
-    mark('unload');
-    measure('session-duration', 'app-init', 'unload');
-    logMetrics();
-  });
-}
+};
+
+export default {
+  mark,
+  measure,
+  observeLongTasks,
+  logMetrics,
+  debounce,
+  throttle,
+  measureTTI,
+  reportWebVitals
+};

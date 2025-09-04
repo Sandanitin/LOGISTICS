@@ -13,6 +13,28 @@
     <link rel="icon" type="image/x-icon" href="/images/logo.png" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
     
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://logistics-tkej.onrender.com" />
+    
+    <!-- Preload critical CSS -->
+    <link 
+      rel="preload" 
+      href="/src/index.css" 
+      as="style" 
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="/src/index.css" /></noscript>
+    
+    <!-- Load fonts with font-display: swap -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+      rel="stylesheet"
+      media="print" 
+      onload="this.media='all'"
+    />
+    
     <!-- Title -->
     <title>ANOWER LOGISTICS | Professional Logistics & Transportation Services</title>
     
@@ -29,20 +51,6 @@
     <meta property="twitter:title" content="ANOWER LOGISTICS | Professional Logistics & Transportation Services" />
     <meta property="twitter:description" content="Fast, reliable, and efficient delivery solutions for your business needs." />
     <meta property="twitter:image" content="https://logistics-1-pvw5.onrender.com/images/logo.png" />
-    
-    <!-- Preconnect to required domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://logistics-tkej.onrender.com" />
-    
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/images/logo.png" as="image" />
-    
-    <!-- Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://logistics-1-pvw5.onrender.com/" />
@@ -69,13 +77,64 @@
       ]
     }
     </script>
+    
+    <!-- Inline critical CSS -->
+    <style>
+      /* Critical CSS for above-the-fold content */
+      :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+      
+      /* Loading state */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
   </head>
   <body>
     <div id="root">
-      <div style="text-align: center; padding: 2rem;">
-        <h1>Loading...</h1>
+      <!-- Loading state -->
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%;">
+        <div>Loading...</div>
       </div>
     </div>
+    
+    <!-- Preload only the standard resolution logo -->
+    <link rel="preload" href="/images/logo.png" as="image" />
+    
+    <!-- Responsive images with srcset for the actual image element -->
+    <img 
+      src="/images/logo.png" 
+      srcset="/images/logo.png 1x, /images/logo@2x.png 2x"
+      alt="ANOWER LOGISTICS Logo"
+      style="display: none;"
+      loading="eager"
+    />
+    
     <script type="module" src="/src/main.jsx"></script>
+    
+    <noscript>
+      <style>
+        body {
+          padding: 2rem;
+          text-align: center;
+        }
+        #root {
+          display: none !important;
+        }
+      </style>
+      <h1>JavaScript is disabled</h1>
+      <p>Please enable JavaScript to use this application.</p>
+    </noscript>
   </body>
 </html>

@@ -8,15 +8,26 @@ import './styles/mobile.css';
 import MobileLayout from './components/MobileLayout';
 import { register as registerServiceWorker } from './utils/registerServiceWorker';
 import { setViewportHeight, preventDoubleTapZoom, isMobile } from './utils/mobileUtils';
-import { measure, mark, observeLongTasks, logMetrics } from './utils/performance';
+import { mark, measure, observeLongTasks, logMetrics, reportWebVitals } from './utils/performance';
 
 // Mark the start of the application
 mark('app-start');
 
+// Initialize performance monitoring
+const initPerformance = () => {
+  // Start observing long tasks
+  observeLongTasks();
+  
+  // Report web vitals
+  if (process.env.NODE_ENV === 'production') {
+    reportWebVitals((metric) => {
+      console.log(metric);
+    });
+  }
+};
+
 // Initialize mobile optimizations
 const initMobileOptimizations = () => {
-  mark('mobile-optimizations-start');
-  
   // Set up viewport height handling
   setViewportHeight();
   
@@ -27,50 +38,21 @@ const initMobileOptimizations = () => {
   if (isMobile()) {
     document.body.classList.add('mobile-device');
   }
-  
-  mark('mobile-optimizations-end');
-  measure('mobile-optimizations', 'mobile-optimizations-start', 'mobile-optimizations-end');
-};
-
-// Initialize performance monitoring
-const initPerformanceMonitoring = () => {
-  // Start observing long tasks
-  observeLongTasks();
-  
-  // Log performance metrics periodically in development
-  if (process.env.NODE_ENV !== 'production') {
-    // Initial metrics after load
-    window.addEventListener('load', () => {
-      mark('app-loaded');
-      measure('app-boot', 'app-start', 'app-loaded');
-      logMetrics();
-    });
-    
-    // Log metrics before unload
-    window.addEventListener('beforeunload', () => {
-      mark('app-unload');
-      measure('app-session', 'app-start', 'app-unload');
-      logMetrics();
-    });
-  }
 };
 
 // Initialize the application
 const initApp = async () => {
-  mark('app-init-start');
-  
   try {
+    // Initialize performance monitoring
+    initPerformance();
+    
     // Initialize mobile optimizations
     initMobileOptimizations();
-    
-    // Initialize performance monitoring
-    initPerformanceMonitoring();
     
     // Register service worker in production
     if (process.env.NODE_ENV === 'production') {
       try {
         await registerServiceWorker();
-        mark('service-worker-registered');
       } catch (error) {
         console.error('Service worker registration failed:', error);
       }
@@ -90,28 +72,21 @@ const initApp = async () => {
       </React.StrictMode>
     );
     
-    mark('app-rendered');
-    measure('app-initial-render', 'app-init-start', 'app-rendered');
+    // Mark app as loaded
+    mark('app-loaded');
+    measure('app-boot', 'app-start', 'app-loaded');
     
   } catch (error) {
     console.error('Failed to initialize application:', error);
-    // You might want to render an error boundary here
   }
 };
 
 // Start the application
 initApp().catch(console.error);
 
-// Log performance metrics for debugging
+// Log performance metrics in development
 if (process.env.NODE_ENV !== 'production') {
-  // Log when the app is idle
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(
-      () => {
-        mark('app-idle');
-        logMetrics();
-      },
-      { timeout: 2000 }
-    );
-  }
+  window.addEventListener('load', () => {
+    logMetrics();
+  });
 }
